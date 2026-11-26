@@ -1,0 +1,13 @@
+[project]
+name = "rag-pipe"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "faiss-cpu>=1.16.0",
+    "langchain>=1.5.2",
+    "langchain-openai>=1.8.5",
+    "numpy>=2.5.5",
+    "python-dotenv>=1.2.4",
+]
