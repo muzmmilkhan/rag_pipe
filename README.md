@@ -47,6 +47,25 @@ uv run streamlit run main.py
 Enter a question in the app to see an answer and, in the **Retrieved Chunks**
 expander, the document excerpts used to generate it.
 
+## Run with Docker
+
+Build the image from the project root:
+
+```bash
+docker build -t rag-pipe .
+```
+
+Run the app, passing configuration from your local `.env` file:
+
+```bash
+docker run --rm -p 8501:8501 --env-file .env rag-pipe
+```
+
+Open [http://localhost:8501](http://localhost:8501) in your browser. The
+`.env` file is excluded from the build context. The `faiss_store/` index and
+mapping are included in the image; if they are missing, the app rebuilds them
+from the document.
+
 ## How it works
 
 1. Splits `data/diabetes.txt` into chunks of up to 100 words.
