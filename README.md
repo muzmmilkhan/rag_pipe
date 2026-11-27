@@ -1,56 +1,60 @@
 # rag-pipe
 
-A small retrieval-augmented generation (RAG) example in Python. It reads a
-local text document, splits it into chunks, embeds the chunks, retrieves the
-most relevant chunks with FAISS, and asks a chat model to answer a question
-using that retrieved context.
-
-The included example uses [`diabetes.txt`](./diabetes.txt) as its document.
+A Streamlit retrieval-augmented generation (RAG) app for asking questions
+about the diabetes information in [`data/diabetes.txt`](./data/diabetes.txt).
+It retrieves relevant text with FAISS and uses a chat model to generate an
+answer grounded in that context.
 
 ## Requirements
 
 - Python 3.12 or newer
 - [uv](https://docs.astral.sh/uv/)
-- An API endpoint and credentials compatible with the embeddings and chat
-  interfaces used by LangChain
+- API credentials and model names for an endpoint compatible with the
+  LangChain OpenAI-compatible embeddings and chat integrations
 
 ## Setup
 
-Install the project dependencies:
+Install dependencies from the project root:
 
 ```bash
 uv sync
 ```
 
-Create a `.env` file in the project directory and set the following values:
+Create a `.env` file in the project root:
 
 ```dotenv
 EURI_API_KEY=your_api_key
 EURI_BASE_URL=https://your-api-base-url
 EMBEDDINGS_MODEL=your-embeddings-model
-CHAT_MODEL=your-chat-model
+LLM_MODEL=your-chat-model
+
+# Optional
+TOP_K=5
+TEMPERATURE=0.7
 ```
 
 Use the base URL and model names provided by your API provider. Keep your API
-key private and do not commit `.env` to version control.
+key private; `.env` is ignored by Git and should not be committed.
 
-## Run
+## Run the app
+
+From the project root, run:
 
 ```bash
-uv run python main.py
+uv run streamlit run main.py
 ```
 
-The script loads `diabetes.txt`, builds an in-memory FAISS index, asks
-“What is the main topic of the document?”, and prints the model's response.
+Enter a question in the app to see an answer and, in the **Retrieved Chunks**
+expander, the document excerpts used to generate it.
 
 ## How it works
 
-1. Loads the document as UTF-8 text.
-2. Splits it into consecutive 100-character chunks.
-3. Creates an embedding for each chunk.
-4. Stores the embeddings in a FAISS `IndexFlatL2` index.
-5. Embeds the question and retrieves the five nearest chunks.
-6. Sends the retrieved context and question to the chat model.
+1. Splits `data/diabetes.txt` into chunks of up to 100 words.
+2. Embeds the chunks and stores them in a FAISS `IndexFlatL2` index.
+3. Embeds each question and retrieves the `TOP_K` closest chunks.
+4. Sends the question and retrieved context to the chat model.
 
-The index is rebuilt each time the script runs; it is not persisted to disk.
-The document path and example question are currently set in `main.py`.
+The FAISS index and its chunk mapping are stored in `faiss_store/`. If they
+are not present, the app builds them from the document on its first run.
+Project file paths are resolved relative to the project, so you can launch
+the app from the repository root without machine-specific absolute paths.
